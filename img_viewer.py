@@ -28,7 +28,9 @@ list_processing = [
     [sg.Text("List of Processing:"),],
     [sg.Button("Image Negative", size=(20, 1), key="ImgNegative"),],
     [sg.Button("Image Rotate", size=(20, 1), key="ImgRotate"),],
-    [sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),]
+    [sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),],
+    [sg.HSeparator()],
+    [sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),]
 ]
 
 # Kolom Area No 4: Area viewer image output
@@ -108,7 +110,8 @@ while True:
         try:
             window["ImgProcessingType"].update("Image Negative")
             img_output=ImgNegative(img_input,coldepth)
-            img_output.save(filename_out)
+            img_input=img_output
+            
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
         except:
@@ -118,7 +121,7 @@ while True:
         try:
             window["ImgProcessingType"].update("Image Rotate")
             img_output=ImgRotate(img_input,coldepth,90,"C")
-            img_output.save(filename_out)
+            img_input = img_output
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
         except:
@@ -127,11 +130,29 @@ while True:
     elif event == "ImgGrayscale":
         try:
             window["ImgProcessingType"].update("Image Grayscale")
-            # Pastikan parameter coldepth dikirimkan sesuai definisi fungsi di processing_list
-            img_output=ImgGrayscale(img_input,coldepth) 
+            img_output=ImgGrayscale(img_input,coldepth)
+            img_input = img_output 
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
         except:
             pass
-
+    
+    elif event == "ImgSave":
+        try:
+            save_path = sg.popup_get_file(
+                    "Save Image As", 
+                    save_as=True, 
+                    no_window=True, 
+                    default_extension=".png",
+                    file_types=(("PNG Files", "*.png"), ("JPEG Files", "*.jpg"), ("All Files", "*.*"))
+                )
+            if save_path:
+                success = SaveImage(img_input, save_path)
+                if success:
+                    sg.popup("Berhasil menyimpan!")
+                else:
+                        sg.popup_error("Gagal menyimpan gambar. Periksa konsol untuk detailnya.")
+        except Exception as e:
+            print(f"Error pada GUI Save: {e}")
+                
 window.close() 

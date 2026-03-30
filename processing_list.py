@@ -4,7 +4,6 @@ def get_display_image(img_pil, max_size=(400, 400)):
     if img_pil is None: return None
     img_temp = img_pil.copy()
     img_temp.thumbnail(max_size)
-
     temp_path = "temp_gui_preview.png"
     img_temp.save(temp_path)
     return temp_path
@@ -84,3 +83,11 @@ def ImgGrayscale(img_input, coldepth):
         img_output = img_output.convert("RGB")
 
     return img_output
+
+def SaveImage(img_pil, path):
+    try:
+        img_pil.save(path)
+        return True
+    except Exception as e:
+        print(f"Error saving: {e}")
+        return False
