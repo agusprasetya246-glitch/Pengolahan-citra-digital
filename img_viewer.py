@@ -29,6 +29,8 @@ list_processing = [
     [sg.Button("Image Negative", size=(20, 1), key="ImgNegative"),],
     [sg.Button("Image Rotate", size=(20, 1), key="ImgRotate"),],
     [sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),],
+    [sg.Text("Brightness Value:"), sg.Input(size=(5, 1), key="BrightVal", default_text="30")],
+    [sg.Button("Adjust Brightness", size=(20, 1), key="ImgBrightness"),],
     [sg.HSeparator()],
     [sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),]
 ]
@@ -82,6 +84,7 @@ while True:
     elif event == "ImgList": # A file was chosen from the listbox
         try:
             filename = os.path.join(values["ImgFolder"], values["ImgList"][0])
+            img_original = Image.open(filename)
             img_input = Image.open(filename)
             display_path = get_display_image(img_input)
 
@@ -131,6 +134,17 @@ while True:
         try:
             window["ImgProcessingType"].update("Image Grayscale")
             img_output=ImgGrayscale(img_input,coldepth)
+            img_input = img_output 
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except:
+            pass
+    
+    elif event == "ImgBrightness":
+        try:
+            nilai = int(values["BrightVal"])
+            window["ImgProcessingType"].update(f"Brightness ({nilai})")
+            img_output=ImgBrightness(img_original, coldepth, nilai)
             img_input = img_output 
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
