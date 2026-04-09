@@ -29,8 +29,8 @@ list_processing = [
     [sg.Button("Image Negative", size=(20, 1), key="ImgNegative"),],
     [sg.Button("Image Rotate", size=(20, 1), key="ImgRotate"),],
     [sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),],
-    [sg.Text("Brightness Value:"), sg.Input(size=(5, 1), key="BrightVal", default_text="30")],
-    [sg.Button("Adjust Brightness", size=(20, 1), key="ImgBrightness"),],
+    [sg.Text("Brightness Value:"),],
+    [sg.Slider(range=(-255, 255), orientation='h', size=(15, 15), default_value=0, key="BrightVal", enable_events=True), sg.Button("reset", size=(5,1), key="Default"),],
     [sg.HSeparator()],
     [sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),]
 ]
@@ -140,7 +140,7 @@ while True:
         except:
             pass
     
-    elif event == "ImgBrightness":
+    elif event == "BrightVal":
         try:
             nilai = int(values["BrightVal"])
             window["ImgProcessingType"].update(f"Brightness ({nilai})")
@@ -148,8 +148,18 @@ while True:
             img_input = img_output 
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
-        except:
-            pass
+        except Exception as e:
+            print(f"Error Live Brightness: {e}")
+
+    elif event == "Default":
+        try:
+            window["BrightVal"].update(0)
+            window["ImgProcessingType"].update("Brightness (0) - Reset")
+            img_input = img_original.copy()
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Error Reset: {e}")
     
     elif event == "ImgSave":
         try:
