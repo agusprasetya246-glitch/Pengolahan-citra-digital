@@ -31,6 +31,7 @@ list_processing = [
     [sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),],
     [sg.Text("Brightness Value:"),],
     [sg.Slider(range=(-255, 255), orientation='h', size=(15, 15), default_value=0, key="BrightVal", enable_events=True), sg.Button("reset", size=(5,1), key="Default"),],
+    [sg.Button("Auto Tone", size=(20,1), key="ImgAutoTone")],
     [sg.HSeparator()],
     [sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),]
 ]
@@ -160,7 +161,17 @@ while True:
             window["ImgOutputViewer"].update(filename=display_out)
         except Exception as e:
             print(f"Error Reset: {e}")
-    
+
+    elif event == "ImgAutoTone":
+        try:
+            window["ImgProcessingType"].update("Auto Tone (Logarithmic)")
+            img_output = ImgAutoTone(img_input, coldepth)
+            img_input = img_output()
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Error Auto Tone: {e}")
+
     elif event == "ImgSave":
         try:
             save_path = sg.popup_get_file(

@@ -1,4 +1,5 @@
 from PIL import Image, ImageOps
+import math
 
 def get_display_image(img_pil, max_size=(400, 400)):
     if img_pil is None: return None
@@ -116,6 +117,33 @@ def ImgBrightness(img_input, coldepth, nilai):
             
             if new_b > 255: new_b = 255
             if new_b < 0: new_b = 0
+            
+            pixels[i, j] = (new_r, new_g, new_b)
+
+    if coldepth == 1:
+        img_output = img_output.convert("1")
+    elif coldepth == 8:
+        img_output = img_output.convert("L")
+    
+    return img_output
+
+def ImgAutoTone(img_input, coldepth):
+    # Pastikan dalam mode RGB untuk pemrosesan piksel
+    if coldepth != 24:
+        img_input = img_input.convert('RGB')
+
+    img_output = Image.new('RGB', (img_input.size[0], img_input.size[1]))
+    pixels = img_output.load()
+
+    c = 255 / math.log(1+255) 
+    
+    for i in range(img_input.size[0]):
+        for j in range(img_input.size[1]):
+            r, g, b = img_input.getpixel((i, j))
+            
+            new_r = int(c * math.log(1 + r))
+            new_g = int(c * math.log(1 + g))
+            new_b = int(c * math.log(1 + b))
             
             pixels[i, j] = (new_r, new_g, new_b)
 
