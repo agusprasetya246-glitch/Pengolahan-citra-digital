@@ -11,6 +11,9 @@ file_list_column = [
     [sg.In(size=(20, 1), enable_events=True, key="ImgFolder"),sg.FolderBrowse(),],        
     [sg.Text("Choose an image from list :"),],
     [sg.Listbox(values=[], enable_events=True, size=(18, 10), key="ImgList")],
+    [sg.Text("Image Information:"),],
+    [sg.Text(size=(20, 1), key="ImgSize"),],
+    [sg.Text(size=(20, 1), key="ImgColorDepth"),],
 ]
 
 # Kolom Area No 2: Area viewer image input
@@ -22,18 +25,15 @@ image_viewer_column = [
 
 # Kolom Area No 3: Area Image info dan Tombol list of processing
 list_processing = [
-    [sg.Text("Image Information:"),],
-    [sg.Text(size=(20, 1), key="ImgSize"),],
-    [sg.Text(size=(20, 1), key="ImgColorDepth"),],
-    [sg.Text("List of Processing:"),],
-    [sg.Button("Image Negative", size=(20, 1), key="ImgNegative"),],
-    [sg.Button("Image Rotate", size=(20, 1), key="ImgRotate"),],
-    [sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),],
-    [sg.Text("Brightness Value:"),],
-    [sg.Slider(range=(-255, 255), orientation='h', size=(15, 15), default_value=0, key="BrightVal", enable_events=True), sg.Button("reset", size=(5,1), key="Default"),],
-    [sg.Button("Auto Tone", size=(20,1), key="ImgAutoTone")],
-    [sg.HSeparator()],
-    [sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),]
+    [sg.Text("List of Processing:")],
+    [sg.Button("Image Negative", size=(20, 1), key="ImgNegative"),
+     sg.Button("Image Rotate", size=(20, 1), key="ImgRotate"),
+     sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),
+     sg.Button("Auto Tone", size=(20,1), key="AutoTone"),
+     sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),
+     sg.Text("Brightness Value:"),
+     sg.Slider(range=(-255, 255), orientation='h', size=(15, 15), default_value=0, key="BrightVal", enable_events=True),sg.Button("reset", size=(5,1), key="Default")
+     ],
 ]
 
 # Kolom Area No 4: Area viewer image output
@@ -45,17 +45,18 @@ image_viewer_column2 = [
 
 # Gabung Full layout
 layout = [
+    [sg.Column(list_processing,expand_x=True)],
+    [sg.HSeparator()],
     [
-        sg.Column(file_list_column),
+        sg.Column(file_list_column, vertical_alignment='top'),
         sg.VSeperator(),
-        sg.Column(image_viewer_column),
+        sg.Column(image_viewer_column, expand_x=True, expand_y=True),
         sg.VSeperator(),
-        sg.Column(list_processing),
-        sg.VSeperator(),
-        sg.Column(image_viewer_column2),
+        sg.Column(image_viewer_column2, expand_x=True, expand_y=True),
     ]
 ]
-window = sg.Window("Mini Image Editor", layout)
+window = sg.Window("Mini Image Editor", layout, resizable=True).finalize()
+window.maximize()
 
 #nama image file temporary setiap kali processing output
 filename_out = "out.png" 
@@ -138,8 +139,18 @@ while True:
             img_input = img_output 
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
-        except:
-            pass
+        except Exception as e:
+            print(f"Error Gryscale: {e}")
+
+    elif event == "AutoTone":
+        try:
+            window["ImgProcessingType"].update("Auto Tone (Logarithmic)")
+            img_output = ImgAutoTone(img_input, coldepth)
+            img_input = img_output
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Error Auto Tone: {e}")
     
     elif event == "BrightVal":
         try:
@@ -161,16 +172,6 @@ while True:
             window["ImgOutputViewer"].update(filename=display_out)
         except Exception as e:
             print(f"Error Reset: {e}")
-
-    elif event == "ImgAutoTone":
-        try:
-            window["ImgProcessingType"].update("Auto Tone (Logarithmic)")
-            img_output = ImgAutoTone(img_input, coldepth)
-            img_input = img_output()
-            display_out = get_display_image(img_output)
-            window["ImgOutputViewer"].update(filename=display_out)
-        except Exception as e:
-            print(f"Error Auto Tone: {e}")
 
     elif event == "ImgSave":
         try:

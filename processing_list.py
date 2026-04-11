@@ -1,7 +1,7 @@
 from PIL import Image, ImageOps
 import math
 
-def get_display_image(img_pil, max_size=(400, 400)):
+def get_display_image(img_pil, max_size=(600, 600)):
     if img_pil is None: return None
     img_temp = img_pil.copy()
     img_temp.thumbnail(max_size)
@@ -135,7 +135,7 @@ def ImgAutoTone(img_input, coldepth):
     img_output = Image.new('RGB', (img_input.size[0], img_input.size[1]))
     pixels = img_output.load()
 
-    c = 255 / math.log(1+255) 
+    c = 255 / math.log(1 + 255) 
     
     for i in range(img_input.size[0]):
         for j in range(img_input.size[1]):
