@@ -153,3 +153,37 @@ def ImgAutoTone(img_input, coldepth):
         img_output = img_output.convert("L")
     
     return img_output
+
+def ImgBlend(img1, img2, alpha_value):
+    # Alpha_value dari slider (0-100) diubah menjadi rentang 0.0 - 1.0 (C)
+    c = alpha_value / 100.0
+    
+    # Pastikan kedua gambar dalam mode RGB
+    img1 = img1.convert('RGB')
+    img2 = img2.convert('RGB')
+    
+    # Resize gambar kedua agar sama dengan gambar pertama
+    if img1.size != img2.size:
+        img2 = img2.resize(img1.size)
+        
+    img_output = Image.new('RGB', (img1.size[0], img1.size[1]))
+    pixels = img_output.load()
+    
+    for i in range(img1.size[0]):
+        for j in range(img1.size[1]):
+            r1, g1, b1 = img1.getpixel((i, j)) # Gambar A
+            r2, g2, b2 = img2.getpixel((i, j)) # Gambar B
+            
+            # Rumus: Pnew = C*A + (1-C)*B
+            new_r = int(c * r1 + (1 - c) * r2)
+            new_g = int(c * g1 + (1 - c) * g2)
+            new_b = int(c * b1 + (1 - c) * b2)
+            
+            # Clipping if Pnew > 255
+            if new_r > 255: new_r = 255
+            if new_g > 255: new_g = 255
+            if new_b > 255: new_b = 255
+            
+            pixels[i, j] = (new_r, new_g, new_b)
+            
+    return img_output
