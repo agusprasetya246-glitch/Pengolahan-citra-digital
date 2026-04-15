@@ -5,25 +5,6 @@ from processing_list import *
 
 sg.theme("LightBlue2")
 
-# Kolom Area No 1: Area open folder and select image
-file_list_column = [
-    [sg.Text("Open Image Folder :"),],
-    [sg.In(size=(20, 1), enable_events=True, key="ImgFolder"),sg.FolderBrowse(),],        
-    [sg.Text("Choose an image from list :"),],
-    [sg.Listbox(values=[], enable_events=True, size=(18, 10), key="ImgList")],
-    [sg.Text("Image Information:"),],
-    [sg.Text(size=(20, 1), key="ImgSize"),],
-    [sg.Text(size=(20, 1), key="ImgColorDepth"),],
-]
-
-# Kolom Area No 2: Area viewer image input
-image_viewer_column = [
-    [sg.Text("Image Input :")],
-    [sg.Text(size=(40, 1), key="FilepathImgInput")],
-    [sg.Image(key="ImgInputViewer")],
-]
-
-# Kolom Area No 3: Area Image info dan Tombol list of processing
 list_processing = [
     [sg.Text("List of Processing:")],
     [sg.Button("Image Negative", size=(20, 1), key="ImgNegative"),
@@ -37,7 +18,22 @@ list_processing = [
      ],
 ]
 
-# Kolom Area No 4: Area viewer image output
+file_list_column = [
+    [sg.Text("Open Image Folder :"),],
+    [sg.In(size=(20, 1), enable_events=True, key="ImgFolder"),sg.FolderBrowse(),],        
+    [sg.Text("Choose an image from list :"),],
+    [sg.Listbox(values=[], enable_events=True, size=(18, 10), key="ImgList")],
+    [sg.Text("Image Information:"),],
+    [sg.Text(size=(20, 1), key="ImgSize"),],
+    [sg.Text(size=(20, 1), key="ImgColorDepth"),],
+]
+
+image_viewer_column = [
+    [sg.Text("Image Input :")],
+    [sg.Text(size=(40, 1), key="FilepathImgInput")],
+    [sg.Image(key="ImgInputViewer")],
+]
+
 image_viewer_column2 = [
     [sg.Text("Image Processing Output:")],
     [sg.Text(size=(40, 1), key="ImgProcessingType")],
@@ -53,7 +49,6 @@ image_viewer_column_2nd = [
     ], key="ColBlend", visible=False))]
 ]
 
-# Update Layout Utama
 layout = [
     [sg.Column(list_processing, expand_x=True)],
     [sg.HSeparator()],
@@ -179,10 +174,10 @@ while True:
     elif event == "Default":
         try:
             window["BrightVal"].update(0)
-            window["BlendAlpha"].update(0)
+            window["BlendAlpha"].update(50)
             window["ImgProcessingType"].update("Brightness (0) - Reset")
             img_input = img_original.copy()
-            display_out = get_display_image(img_output)
+            display_out = get_display_image(img_input)
             window["ImgOutputViewer"].update(filename=display_out)
         except Exception as e:
             print(f"Error Reset: {e}")
