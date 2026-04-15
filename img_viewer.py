@@ -30,6 +30,7 @@ list_processing = [
      sg.Button("Image Rotate", size=(20, 1), key="ImgRotate"),
      sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),
      sg.Button("Auto Tone", size=(20,1), key="AutoTone"),
+     sg.Button("blend",size=(20,1), key="ModeBlend"),
      sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),
      sg.Text("Brightness Value:"),
      sg.Slider(range=(-255, 255), orientation='h', size=(15, 15), default_value=0, key="BrightVal", enable_events=True),sg.Button("reset", size=(5,1), key="Default")
@@ -43,18 +44,30 @@ image_viewer_column2 = [
     [sg.Image(key="ImgOutputViewer")],
 ]
 
-# Gabung Full layout
+image_viewer_column_2nd = [
+    [sg.pin(sg.Column([
+        [sg.Text("Image Input 2 (Blend):"),sg.Button("Select 2nd Image", key="ImgSelect2")],
+        [sg.Image(key="ImgInputViewer2")],
+        [sg.Text("Opacity:")],
+        [sg.Slider(range=(0, 100), orientation='h', default_value=50, key="BlendAlpha", enable_events=True)]
+    ], key="ColBlend", visible=False))]
+]
+
+# Update Layout Utama
 layout = [
-    [sg.Column(list_processing,expand_x=True)],
+    [sg.Column(list_processing, expand_x=True)],
     [sg.HSeparator()],
     [
         sg.Column(file_list_column, vertical_alignment='top'),
         sg.VSeperator(),
-        sg.Column(image_viewer_column, expand_x=True, expand_y=True),
+        sg.Column(image_viewer_column, expand_x=True, expand_y=True, vertical_alignment='top'),
         sg.VSeperator(),
-        sg.Column(image_viewer_column2, expand_x=True, expand_y=True),
+        sg.Column(image_viewer_column_2nd, vertical_alignment='top'),
+        sg.VSeperator(),
+        sg.Column(image_viewer_column2, expand_x=True, expand_y=True, vertical_alignment='top'),
     ]
 ]
+
 window = sg.Window("Mini Image Editor", layout, resizable=True).finalize()
 window.maximize()
 
@@ -166,6 +179,7 @@ while True:
     elif event == "Default":
         try:
             window["BrightVal"].update(0)
+            window["BlendAlpha"].update(0)
             window["ImgProcessingType"].update("Brightness (0) - Reset")
             img_input = img_original.copy()
             display_out = get_display_image(img_output)
@@ -190,5 +204,27 @@ while True:
                         sg.popup_error("Gagal menyimpan gambar. Periksa konsol untuk detailnya.")
         except Exception as e:
             print(f"Error pada GUI Save: {e}")
+
+    elif event == "ModeBlend":
+        # Toggle visibilitas kolom blend
+        is_visible = window["ColBlend"].visible
+        window["ColBlend"].update(visible=not is_visible)
+    
+    elif event == "ImgSelect2":
+        filename2 = sg.popup_get_file("Pilih Gambar Kedua", no_window=True)
+        if filename2:
+            img_input2 = Image.open(filename2)
+            display_path2 = get_display_image(img_input2)
+            window["ImgInputViewer2"].update(filename=display_path2)
+
+    elif event == "BlendAlpha":
+        try:
+            # Pastikan img_input2 sudah ada
+            img_output = ImgBlend(img_original, img_input2, values["BlendAlpha"])
+            img_input = img_output
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Pilih gambar kedua dulu: {e}")
                 
 window.close() 

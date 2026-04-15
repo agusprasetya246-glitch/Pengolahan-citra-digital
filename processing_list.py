@@ -1,7 +1,7 @@
 from PIL import Image, ImageOps
 import math
 
-def get_display_image(img_pil, max_size=(600, 600)):
+def get_display_image(img_pil, max_size=(390, 693)):
     if img_pil is None: return None
     img_temp = img_pil.copy()
     img_temp.thumbnail(max_size)
