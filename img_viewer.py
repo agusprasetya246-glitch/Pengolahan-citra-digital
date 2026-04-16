@@ -48,7 +48,9 @@ list_processing = [
      ],
      [sg.Button("Image Rotate 90C", size=(20, 1), key="ImgRotate"),
       sg.Button("Image Rotate 90CCW", size=(20, 1), key="ImgRotateCCW"),
-      sg.Button("Image Rotate 180", size=(20, 1), key="ImgRotate180"),]
+      sg.Button("Image Rotate 180", size=(20, 1), key="ImgRotate180"),
+      sg.Button("Flip(V)", size=(20, 1), key="flipv"),
+      sg.Button("Flip(H)", size=(20, 1), key="fliph"),]
 ]
 
 layout = [
@@ -159,6 +161,26 @@ while True:
         except:
             pass
     
+    elif event == "fliph":
+        try:
+            window["ImgProcessingType"].update("Flip Horizontal")
+            img_output = ImgFlip(img_input, coldepth, "H")
+            img_output.save(filename_out)
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Error Flip H: {e}")
+
+    elif event == "flipv":
+        try:
+            window["ImgProcessingType"].update("Flip Vertical")
+            img_output = ImgFlip(img_input, coldepth, "V")
+            img_output.save(filename_out)
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Error Flip V: {e}")
+
     elif event == "ImgGrayscale":
         try:
             window["ImgProcessingType"].update("Image Grayscale")

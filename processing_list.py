@@ -194,3 +194,30 @@ def ImgBlend(img1, img2, alpha_value):
             pixels[i, j] = (new_r, new_g, new_b)
             
     return img_output
+
+def ImgFlip(img_input, coldepth, mode):
+    # Pastikan dalam mode RGB untuk pemrosesan piksel
+    if coldepth != 24:
+        img_input = img_input.convert('RGB')
+
+    # Dimensi tetap sama, tidak berubah seperti rotasi
+    width, height = img_input.size
+    img_output = Image.new('RGB', (width, height))
+    pixels = img_output.load()
+    
+    for i in range(width):
+        for j in range(height):
+            if mode == "H":
+                r, g, b = img_input.getpixel((i, height - 1 - j))
+            elif mode == "V":
+                r, g, b = img_input.getpixel((width - 1 - i, j))
+            
+            pixels[i, j] = (r, g, b)
+
+    # Kembalikan ke Color Depth asli sesuai variabel coldepth yang kamu miliki
+    if coldepth == 1:
+        img_output = img_output.convert("1")
+    elif coldepth == 8:
+        img_output = img_output.convert("L")
+    
+    return img_output
