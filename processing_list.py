@@ -9,6 +9,15 @@ def get_display_image(img_pil, max_size=(390, 693)):
     img_temp.save(temp_path)
     return temp_path
 
+def SaveImage(img_pil, path):
+    try:
+        img_pil.save(path)
+        return True
+    except Exception as e:
+        print(f"Error saving: {e}")
+        return False
+    
+#aritmatika
 def ImgNegative(img_input,coldepth):
 
     if coldepth!=24:
@@ -20,39 +29,6 @@ def ImgNegative(img_input,coldepth):
         for j in range(img_output.size[1]):
             r, g, b = img_input.getpixel((i, j))
             pixels[i,j] = (255-r, 255-g, 255-b)
-
-    if coldepth==1:
-        img_output = img_output.convert("1")
-    elif coldepth==8:
-        img_output = img_output.convert("L")
-    else:
-        img_output = img_output.convert("RGB")
-
-    return img_output
-
-def ImgRotate(img_input,coldepth,deg,direction):
-    
-    if coldepth!=24:
-        img_input = img_input.convert('RGB')
-    
-    if direction == "180":
-        img_output = Image.new('RGB', (img_input.size[0], img_input.size[1]))
-    else: # Untuk 90 CW atau 90 CCW
-        img_output = Image.new('RGB', (img_input.size[1], img_input.size[0]))
-
-    
-    pixels = img_output.load()
-    width_in, height_in = img_input.size
-    
-    for i in range(img_output.size[0]):
-        for j in range(img_output.size[1]):
-            if direction == "C": # 90 Degree CW
-                r, g, b = img_input.getpixel((j, height_in - 1 - i))
-            elif direction == "CC": # 90 Degree CCW
-                r, g, b = img_input.getpixel((width_in - 1 - j, i))
-            elif direction == "180": # 180 Degree
-                r, g, b = img_input.getpixel((width_in - 1 - i, height_in - 1 - j))
-            pixels[i,j] = (r, g, b)
 
     if coldepth==1:
         img_output = img_output.convert("1")
@@ -87,14 +63,6 @@ def ImgGrayscale(img_input, coldepth):
         img_output = img_output.convert("RGB")
 
     return img_output
-
-def SaveImage(img_pil, path):
-    try:
-        img_pil.save(path)
-        return True
-    except Exception as e:
-        print(f"Error saving: {e}")
-        return False
 
 def ImgBrightness(img_input, coldepth, nilai):
     # Pastikan dalam mode RGB untuk pemrosesan piksel
@@ -132,7 +100,7 @@ def ImgBrightness(img_input, coldepth, nilai):
     
     return img_output
 
-def ImgAutoTone(img_input, coldepth):
+def log(img_input, coldepth):
     # Pastikan dalam mode RGB untuk pemrosesan piksel
     if coldepth != 24:
         img_input = img_input.convert('RGB')
@@ -193,6 +161,40 @@ def ImgBlend(img1, img2, alpha_value):
             
             pixels[i, j] = (new_r, new_g, new_b)
             
+    return img_output
+
+#geometri
+def ImgRotate(img_input,coldepth,deg,direction):
+    
+    if coldepth!=24:
+        img_input = img_input.convert('RGB')
+    
+    if direction == "180":
+        img_output = Image.new('RGB', (img_input.size[0], img_input.size[1]))
+    else: # Untuk 90 CW atau 90 CCW
+        img_output = Image.new('RGB', (img_input.size[1], img_input.size[0]))
+
+    
+    pixels = img_output.load()
+    width_in, height_in = img_input.size
+    
+    for i in range(img_output.size[0]):
+        for j in range(img_output.size[1]):
+            if direction == "C": # 90 Degree CW
+                r, g, b = img_input.getpixel((j, height_in - 1 - i))
+            elif direction == "CC": # 90 Degree CCW
+                r, g, b = img_input.getpixel((width_in - 1 - j, i))
+            elif direction == "180": # 180 Degree
+                r, g, b = img_input.getpixel((width_in - 1 - i, height_in - 1 - j))
+            pixels[i,j] = (r, g, b)
+
+    if coldepth==1:
+        img_output = img_output.convert("1")
+    elif coldepth==8:
+        img_output = img_output.convert("L")
+    else:
+        img_output = img_output.convert("RGB")
+
     return img_output
 
 def ImgFlip(img_input, coldepth, mode):

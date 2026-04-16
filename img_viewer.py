@@ -40,7 +40,7 @@ list_processing = [
     [sg.Text("List of Processing:")],
     [sg.Button("Image Negative", size=(20, 1), key="ImgNegative"),
      sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),
-     sg.Button("Logaritmik", size=(20,1), key="AutoTone"),
+     sg.Button("Logaritmik", size=(20,1), key="Log"),
      sg.Button("blend mode",size=(20,1), key="ModeBlend"),
      sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),
      sg.Text("Brightness Value:"),
@@ -93,6 +93,7 @@ while True:
             and f.lower().endswith((".png", ".gif"))
         ]
         window["ImgList"].update(fnames)
+        
     elif event == "ImgList": # A file was chosen from the listbox
         try:
             filename = os.path.join(values["ImgFolder"], values["ImgList"][0])
@@ -121,6 +122,7 @@ while True:
         except Exception as e:
             print(f"Error: {e}")
 
+#ARITMATIKA
     elif event == "ImgNegative":
         try:
             window["ImgProcessingType"].update("Image Negative")
@@ -131,6 +133,60 @@ while True:
         except:
             pass
 
+    elif event == "ImgGrayscale":
+        try:
+            window["ImgProcessingType"].update("Image Grayscale")
+            img_output=ImgGrayscale(img_input,coldepth)
+            img_output.save(filename_out)
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Error Gryscale: {e}")
+
+    elif event == "Log":
+        try:
+            window["ImgProcessingType"].update("Logarithmic")
+            img_output = log(img_input, coldepth)
+            img_output.save(filename_out)
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Error Auto Tone: {e}")
+    
+    elif event == "BrightVal":
+        try:
+            nilai = int(values["BrightVal"])
+            window["ImgProcessingType"].update(f"Brightness ({nilai})")
+            img_output=ImgBrightness(img_original, coldepth, nilai)
+            img_output.save(filename_out) 
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Error Live Brightness: {e}")
+
+    elif event == "ModeBlend":
+        # Toggle visibilitas kolom blend
+        is_visible = window["ColBlend"].visible
+        window["ColBlend"].update(visible=not is_visible)
+    
+    elif event == "ImgSelect2":
+        filename2 = sg.popup_get_file("Pilih Gambar Kedua", no_window=True)
+        if filename2:
+            img_input2 = Image.open(filename2)
+            display_path2 = get_display_image(img_input2)
+            window["ImgInputViewer2"].update(filename=display_path2)
+
+    elif event == "BlendAlpha":
+        try:
+            # Pastikan img_input2 sudah ada
+            img_output = ImgBlend(img_original, img_input2, values["BlendAlpha"])
+            img_output.save(filename_out)
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Pilih gambar kedua dulu: {e}")
+
+#GEOMETRI
     elif event == "ImgRotate":
         try:
             window["ImgProcessingType"].update("Image Rotate")
@@ -181,37 +237,6 @@ while True:
         except Exception as e:
             print(f"Error Flip V: {e}")
 
-    elif event == "ImgGrayscale":
-        try:
-            window["ImgProcessingType"].update("Image Grayscale")
-            img_output=ImgGrayscale(img_input,coldepth)
-            img_output.save(filename_out)
-            display_out = get_display_image(img_output)
-            window["ImgOutputViewer"].update(filename=display_out)
-        except Exception as e:
-            print(f"Error Gryscale: {e}")
-
-    elif event == "AutoTone":
-        try:
-            window["ImgProcessingType"].update("Auto Tone (Logarithmic)")
-            img_output = ImgAutoTone(img_input, coldepth)
-            img_output.save(filename_out)
-            display_out = get_display_image(img_output)
-            window["ImgOutputViewer"].update(filename=display_out)
-        except Exception as e:
-            print(f"Error Auto Tone: {e}")
-    
-    elif event == "BrightVal":
-        try:
-            nilai = int(values["BrightVal"])
-            window["ImgProcessingType"].update(f"Brightness ({nilai})")
-            img_output=ImgBrightness(img_original, coldepth, nilai)
-            img_output.save(filename_out) 
-            display_out = get_display_image(img_output)
-            window["ImgOutputViewer"].update(filename=display_out)
-        except Exception as e:
-            print(f"Error Live Brightness: {e}")
-
     elif event == "Default":
         try:
             window["BrightVal"].update(0)
@@ -240,27 +265,5 @@ while True:
                         sg.popup_error("Gagal menyimpan gambar. Periksa konsol untuk detailnya.")
         except Exception as e:
             print(f"Error pada GUI Save: {e}")
-
-    elif event == "ModeBlend":
-        # Toggle visibilitas kolom blend
-        is_visible = window["ColBlend"].visible
-        window["ColBlend"].update(visible=not is_visible)
-    
-    elif event == "ImgSelect2":
-        filename2 = sg.popup_get_file("Pilih Gambar Kedua", no_window=True)
-        if filename2:
-            img_input2 = Image.open(filename2)
-            display_path2 = get_display_image(img_input2)
-            window["ImgInputViewer2"].update(filename=display_path2)
-
-    elif event == "BlendAlpha":
-        try:
-            # Pastikan img_input2 sudah ada
-            img_output = ImgBlend(img_original, img_input2, values["BlendAlpha"])
-            img_output.save(filename_out)
-            display_out = get_display_image(img_output)
-            window["ImgOutputViewer"].update(filename=display_out)
-        except Exception as e:
-            print(f"Pilih gambar kedua dulu: {e}")
                 
 window.close() 
