@@ -5,19 +5,6 @@ from processing_list import *
 
 sg.theme("LightBlue2")
 
-list_processing = [
-    [sg.Text("List of Processing:")],
-    [sg.Button("Image Negative", size=(20, 1), key="ImgNegative"),
-     sg.Button("Image Rotate", size=(20, 1), key="ImgRotate"),
-     sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),
-     sg.Button("Auto Tone", size=(20,1), key="AutoTone"),
-     sg.Button("blend",size=(20,1), key="ModeBlend"),
-     sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),
-     sg.Text("Brightness Value:"),
-     sg.Slider(range=(-255, 255), orientation='h', size=(15, 15), default_value=0, key="BrightVal", enable_events=True),sg.Button("reset", size=(5,1), key="Default")
-     ],
-]
-
 file_list_column = [
     [sg.Text("Open Image Folder :"),],
     [sg.In(size=(20, 1), enable_events=True, key="ImgFolder"),sg.FolderBrowse(),],        
@@ -44,9 +31,24 @@ image_viewer_column_2nd = [
     [sg.pin(sg.Column([
         [sg.Text("Image Input 2 (Blend):"),sg.Button("Select 2nd Image", key="ImgSelect2")],
         [sg.Image(key="ImgInputViewer2")],
-        [sg.Text("Opacity:")],
+        [sg.Text("Opacity (%):")],
         [sg.Slider(range=(0, 100), orientation='h', default_value=50, key="BlendAlpha", enable_events=True)]
     ], key="ColBlend", visible=False))]
+]
+
+list_processing = [
+    [sg.Text("List of Processing:")],
+    [sg.Button("Image Negative", size=(20, 1), key="ImgNegative"),
+     sg.Button("Image Grayscale", size=(20, 1), key="ImgGrayscale"),
+     sg.Button("Logaritmik", size=(20,1), key="AutoTone"),
+     sg.Button("blend mode",size=(20,1), key="ModeBlend"),
+     sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),
+     sg.Text("Brightness Value:"),
+     sg.Slider(range=(-255, 255), orientation='h', size=(15, 15), default_value=0, key="BrightVal", enable_events=True),sg.Button("reset", size=(5,1), key="Default")
+     ],
+     [sg.Button("Image Rotate 90C", size=(20, 1), key="ImgRotate"),
+      sg.Button("Image Rotate 90CCW", size=(20, 1), key="ImgRotateCCW"),
+      sg.Button("Image Rotate 180", size=(20, 1), key="ImgRotate180"),]
 ]
 
 layout = [
@@ -66,10 +68,8 @@ layout = [
 window = sg.Window("Mini Image Editor", layout, resizable=True).finalize()
 window.maximize()
 
-#nama image file temporary setiap kali processing output
 filename_out = "out.png" 
 
-# Run the Event Loop
 while True:
     event, values = window.read()
     if event == "Exit" or event == sg.WIN_CLOSED:
@@ -123,8 +123,7 @@ while True:
         try:
             window["ImgProcessingType"].update("Image Negative")
             img_output=ImgNegative(img_input,coldepth)
-            img_input=img_output
-            
+            img_output.save(filename_out)
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
         except:
@@ -134,7 +133,27 @@ while True:
         try:
             window["ImgProcessingType"].update("Image Rotate")
             img_output=ImgRotate(img_input,coldepth,90,"C")
-            img_input = img_output
+            img_output.save(filename_out)
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except:
+            pass
+
+    elif event == "ImgRotateCCW":
+        try:
+            window["ImgProcessingType"].update("Image Rotate")
+            img_output=ImgRotate(img_input,coldepth,-90,"CC")
+            img_output.save(filename_out)
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except:
+            pass
+
+    elif event == "ImgRotate180":
+        try:
+            window["ImgProcessingType"].update("Image Rotate")
+            img_output=ImgRotate(img_input,coldepth,180,"180")
+            img_output.save(filename_out)
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
         except:
@@ -144,7 +163,7 @@ while True:
         try:
             window["ImgProcessingType"].update("Image Grayscale")
             img_output=ImgGrayscale(img_input,coldepth)
-            img_input = img_output 
+            img_output.save(filename_out)
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
         except Exception as e:
@@ -154,7 +173,7 @@ while True:
         try:
             window["ImgProcessingType"].update("Auto Tone (Logarithmic)")
             img_output = ImgAutoTone(img_input, coldepth)
-            img_input = img_output
+            img_output.save(filename_out)
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
         except Exception as e:
@@ -165,7 +184,7 @@ while True:
             nilai = int(values["BrightVal"])
             window["ImgProcessingType"].update(f"Brightness ({nilai})")
             img_output=ImgBrightness(img_original, coldepth, nilai)
-            img_input = img_output 
+            img_output.save(filename_out) 
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
         except Exception as e:
@@ -176,7 +195,7 @@ while True:
             window["BrightVal"].update(0)
             window["BlendAlpha"].update(50)
             window["ImgProcessingType"].update("Brightness (0) - Reset")
-            img_input = img_original.copy()
+            img_output.save(filename_out)
             display_out = get_display_image(img_input)
             window["ImgOutputViewer"].update(filename=display_out)
         except Exception as e:
@@ -216,7 +235,7 @@ while True:
         try:
             # Pastikan img_input2 sudah ada
             img_output = ImgBlend(img_original, img_input2, values["BlendAlpha"])
-            img_input = img_output
+            img_output.save(filename_out)
             display_out = get_display_image(img_output)
             window["ImgOutputViewer"].update(filename=display_out)
         except Exception as e:

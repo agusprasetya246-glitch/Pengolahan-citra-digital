@@ -10,10 +10,7 @@ def get_display_image(img_pil, max_size=(390, 693)):
     return temp_path
 
 def ImgNegative(img_input,coldepth):
-    #solusi 1
-    #img_output=ImageOps.invert(img_input)
 
-    #solusi 2
     if coldepth!=24:
         img_input = img_input.convert('RGB')
 
@@ -34,21 +31,27 @@ def ImgNegative(img_input,coldepth):
     return img_output
 
 def ImgRotate(img_input,coldepth,deg,direction):
-    #solusi 1
-    #img_output=img_input.rotate(deg)
-
-    #solusi 2
+    
     if coldepth!=24:
         img_input = img_input.convert('RGB')
+    
+    if direction == "180":
+        img_output = Image.new('RGB', (img_input.size[0], img_input.size[1]))
+    else: # Untuk 90 CW atau 90 CCW
+        img_output = Image.new('RGB', (img_input.size[1], img_input.size[0]))
 
-    img_output = Image.new('RGB',(img_input.size[1],img_input.size[0]))
+    
     pixels = img_output.load()
+    width_in, height_in = img_input.size
+    
     for i in range(img_output.size[0]):
         for j in range(img_output.size[1]):
-            if direction=="C":
-                r, g, b = img_input.getpixel((j,img_output.size[0]-i-1))
-            else:
-                r, g, b = img_input.getpixel((img_input.size[1]-j-1,i))
+            if direction == "C": # 90 Degree CW
+                r, g, b = img_input.getpixel((j, height_in - 1 - i))
+            elif direction == "CC": # 90 Degree CCW
+                r, g, b = img_input.getpixel((width_in - 1 - j, i))
+            elif direction == "180": # 180 Degree
+                r, g, b = img_input.getpixel((width_in - 1 - i, height_in - 1 - j))
             pixels[i,j] = (r, g, b)
 
     if coldepth==1:
@@ -124,6 +127,8 @@ def ImgBrightness(img_input, coldepth, nilai):
         img_output = img_output.convert("1")
     elif coldepth == 8:
         img_output = img_output.convert("L")
+    else:
+        img_output = img_output.convert("RGB")
     
     return img_output
 
@@ -151,6 +156,8 @@ def ImgAutoTone(img_input, coldepth):
         img_output = img_output.convert("1")
     elif coldepth == 8:
         img_output = img_output.convert("L")
+    else:
+        img_output = img_output.convert("RGB")
     
     return img_output
 
