@@ -1,0 +1,2 @@
+FreeSimpleGUI==5.2.0.post1
+pillow==12.2.0
