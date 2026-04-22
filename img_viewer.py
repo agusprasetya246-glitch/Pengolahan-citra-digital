@@ -68,7 +68,6 @@ layout = [
 ]
 
 window = sg.Window("Mini Image Editor", layout, resizable=True).finalize()
-window.maximize()
 
 filename_out = "out.png" 
 
