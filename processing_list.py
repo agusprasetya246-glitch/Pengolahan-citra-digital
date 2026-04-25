@@ -223,3 +223,72 @@ def ImgFlip(img_input, coldepth, mode):
         img_output = img_output.convert("L")
     
     return img_output
+
+#PERCOBAAN
+def ImgTranslation(img_input, coldepth, tx, ty):
+    # Konversi ke RGB untuk manipulasi piksel
+    if coldepth != 24:
+        img_input = img_input.convert('RGB')
+
+    width, height = img_input.size
+    # Buat kanvas baru dengan warna latar hitam (0,0,0)
+    img_output = Image.new('RGB', (width, height), (0, 0, 0))
+    pixels = img_output.load()
+
+    for i in range(width):
+        for j in range(height):
+            # Koordinat asal
+            orig_x = i - tx
+            orig_y = j - ty
+
+            # Cek apakah koordinat asal ada di dalam bingkai gambar asli
+            if 0 <= orig_x < width and 0 <= orig_y < height:
+                r, g, b = img_input.getpixel((orig_x, orig_y))
+                pixels[i, j] = (r, g, b)
+            # Jika di luar, biarkan tetap hitam (0,0,0)
+
+    # Kembalikan ke Color Depth asli
+    if coldepth == 1:
+        img_output = img_output.convert("1")
+    elif coldepth == 8:
+        img_output = img_output.convert("L")
+    
+    return img_output
+
+def ImgZoomOut(img_input, coldepth, factor):
+    if coldepth != 24:
+        img_input = img_input.convert('RGB')
+    
+    width, height = img_input.size
+    new_width, new_height = width // factor, height // factor
+    
+    img_output = Image.new('RGB', (new_width, new_height))
+    pixels = img_output.load()
+    
+    for i in range(new_width):
+        for j in range(new_height):
+            # Mengambil piksel dengan melompati koordinat
+            r, g, b = img_input.getpixel((i * factor, j * factor))
+            pixels[i, j] = (r, g, b)
+            
+    return img_output
+
+def ImgZoomIn(img_input, coldepth, factor):
+    if coldepth != 24:
+        img_input = img_input.convert('RGB')
+        
+    width, height = img_input.size
+    new_width, new_height = width * factor, height * factor
+    
+    img_output = Image.new('RGB', (new_width, new_height))
+    pixels = img_output.load()
+    
+    for i in range(new_width):
+        for j in range(new_height):
+            # Pixel Replication: memetakan koordinat baru ke satu piksel asal
+            orig_x = i // factor
+            orig_y = j // factor
+            r, g, b = img_input.getpixel((orig_x, orig_y))
+            pixels[i, j] = (r, g, b)
+            
+    return img_output

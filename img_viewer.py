@@ -45,12 +45,21 @@ list_processing = [
      sg.Button("Save Image", size=(20, 1), button_color=("white", "green"), key="ImgSave"),
      sg.Text("Brightness Value:"),
      sg.Slider(range=(-255, 255), orientation='h', size=(15, 15), default_value=0, key="BrightVal", enable_events=True),sg.Button("reset", size=(5,1), key="Default")
-     ],
-     [sg.Button("Image Rotate 90C", size=(20, 1), key="ImgRotate"),
-      sg.Button("Image Rotate 90CCW", size=(20, 1), key="ImgRotateCCW"),
-      sg.Button("Image Rotate 180", size=(20, 1), key="ImgRotate180"),
-      sg.Button("Flip(V)", size=(20, 1), key="flipv"),
-      sg.Button("Flip(H)", size=(20, 1), key="fliph"),]
+    ],
+    [sg.Button("Image Rotate 90C", size=(20, 1), key="ImgRotate"),
+     sg.Button("Image Rotate 90CCW", size=(20, 1), key="ImgRotateCCW"),
+     sg.Button("Image Rotate 180", size=(20, 1), key="ImgRotate180"),
+     sg.Button("Flip(V)", size=(20, 1), key="flipv"),
+     sg.Button("Flip(H)", size=(20, 1), key="fliph"),],
+
+     #PERCOBAAN
+    [sg.Text("Translation X:"), sg.In(size=(5, 1), key="Tx", default_text="0"),
+     sg.Text("Y:"), sg.In(size=(5, 1), key="Ty", default_text="0"),
+     sg.Button("Translate", key="BtnTranslate")],
+    [sg.Text("Zoom Factor:"), 
+     sg.Combo([2, 3, 4], default_value=2, key="ZoomFact"),
+     sg.Button("Zoom In", key="BtnZoomIn"), 
+     sg.Button("Zoom Out", key="BtnZoomOut")],
 ]
 
 layout = [
@@ -265,4 +274,43 @@ while True:
         except Exception as e:
             print(f"Error pada GUI Save: {e}")
                 
+    elif event == "BtnTranslate":
+        try:
+            # Ambil nilai pergeseran dari input teks
+            tx = int(values["Tx"])
+            ty = int(values["Ty"])
+            
+            window["ImgProcessingType"].update(f"Translation ({tx}, {ty})")
+            
+            # Panggil fungsi translasi
+            img_output = ImgTranslation(img_input, coldepth, tx, ty)
+            img_input = img_output # Agar bisa diproses berantai
+            
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            sg.popup_error(f"Masukkan angka yang valid untuk Tx dan Ty!\nError: {e}")
+
+    elif event == "BtnZoomIn":
+        try:
+            factor = int(values["ZoomFact"])
+            window["ImgProcessingType"].update(f"Zoom In ({factor}x)")
+            img_output = ImgZoomIn(img_input, coldepth, factor)
+            img_input = img_output # Update buffer agar bisa diolah lagi
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Error Zoom In: {e}")
+
+    elif event == "BtnZoomOut":
+        try:
+            factor = int(values["ZoomFact"])
+            window["ImgProcessingType"].update(f"Zoom Out (1/{factor}x)")
+            img_output = ImgZoomOut(img_input, coldepth, factor)
+            img_input = img_output
+            display_out = get_display_image(img_output)
+            window["ImgOutputViewer"].update(filename=display_out)
+        except Exception as e:
+            print(f"Error Zoom Out: {e}")
+
 window.close() 
